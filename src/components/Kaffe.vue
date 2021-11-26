@@ -7,7 +7,7 @@
         <h1>{{ amount }} cups</h1>
         <h2>Scan card after the correct amount is selected</h2>
       </div>
-      <div v-if="card">
+      <div v-if="card && score">
         <h1>{{ amount }} cups registered!</h1>
         <font-awesome-icon :icon="['fas', 'mug-hot']" size="6x" />
       </div>
@@ -41,6 +41,7 @@ export default {
       showScore: false,
       scoreCount: 0,
       card: false,
+      register: false
     };
   },
   methods: {
@@ -61,6 +62,7 @@ export default {
       this.card = false;
       this.scoring = false;
       this.showScore = false;
+      this.register = false;
     },
     onkey(e) {
       switch (e.key) {
@@ -78,7 +80,12 @@ export default {
           this.score = true;
           break;
         case "h": // CARD SCANNED
-          this.card = true;
+          this.getCard();
+          if (this.showScore) {
+            this.getScore(this.uuid)
+          } else if (this.score) {
+            this.addScore(this.uuid)
+          }
           setTimeout(
             function () {
               this.reset();
@@ -88,6 +95,26 @@ export default {
           break;
       }
     },
+    async getCard() {
+      // await 
+      user = {uuid: "432", score: 4, date: "11-12-2021"};
+      this.uuid = user.uuid;
+      if (this.uuid == "unknown" || date > currentDate) {
+        this.register();
+      }
+      this.card = true;
+    },
+    async getScore(uuid) {
+      // await get from server
+      this.scoreCount = 4;
+    },
+    async addScore(uuid) {
+      //await inc score with amount to server
+      console.log(`ADDED ${this.amount} TO ${this.uuid}`)
+    },
+    async register(uuid) {
+      this.register = true;
+    }
   },
 };
 </script>
