@@ -5,14 +5,18 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Run frontend in electron
+```
+npm run electron:serve
+```
+### Run frontend
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Run server
 ```
-npm run build
+cd src/functions && export FLASK_APP=server && flask run --host=0.0.0.0
 ```
 
 ### Customize configuration
