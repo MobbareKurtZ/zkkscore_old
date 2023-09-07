@@ -14,9 +14,6 @@ class DataHandler {
       measurementId: "G-X3MK5PJGDL"
     };
 
-    // this.app = firebase.initializeApp(firebaseConfig);
-    // this.db = firestore.getFirestore(this.app);
-    // this.db = this.app.firestore();
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   }
@@ -25,8 +22,6 @@ class DataHandler {
     let users = this.db.collection('users')
     return userRef;
   }
-
-
 
 }
 

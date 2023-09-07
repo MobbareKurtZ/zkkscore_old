@@ -60,7 +60,6 @@ export default {
       scoreCount: 0,
       card: false,
       register: false,
-      path: "http://localhost:5000",
       tm: null,
     };
   },
@@ -86,7 +85,6 @@ export default {
           this.scoring = false;
           this.showScore = false;
           this.register = false;
-          this.axios.get(this.path + "/stop");
         }.bind(this),
         timeout
       );
@@ -126,36 +124,33 @@ export default {
     },
     async getCard() {
       this.reset(15000);
-      await this.axios.get(this.path + "/scan?timeout=15").then((response) => {
-        this.uuid = response.data;
-	console.log(response.data)
-        if (this.uuid != "None") {
-          this.card = true;
-        }
-      });
+      const uid = await this.reader.run()
+      if (uid != null) {
+        this.card = true;
+      } else {
+        this.reset(0);
+      }
+      return uid;
+    },
+    async getUser() {
+      const uid = await this.getCard();
+      const user = await this.dataHandler.getUser(uid);
+      return user
     },
     async getScore() {
-      console.log("SCANNSDJISJFIHAIDSa")
-      await this.getCard();
-      if (this.card) {
-        await this.axios
-          .get(this.path + "/get-user?uuid=" + this.uuid)
-          .then((response) => {
-            this.scoreCount = response.data.score;
-            if (!response.data.pay) {
-              this.register = true;
-            }
-            this.reset(4000);
-          });
+      const uid = await this.getCard();
+      if (uid) {
+        const user = await this.dataHandler.getUser(uid)
+        this.scoreCount = user.score;
+        this.register = !user.paid;
+        this.reset(4000);
       }
     },
     async addScore() {
-      await this.getCard();
-      if (this.card) {
-        await this.axios
-          .get(this.path + "/score?uuid=" + this.uuid + "&inc=" + this.amount)
-          .then((response) => {
-            if (!response.data.pay) {
+      const uid = await this.getCard();
+      if (uid) {
+        await this.dataHandler.addScore(uid, this.score).then((response) => {
+            if (!response.pay) {
               this.register = true;
               this.stop();
             } else {
@@ -166,7 +161,7 @@ export default {
       }
     },
     async pay() {
-      this.axios.post(this.path + "/pay?uuid=" + this.uuid);
+      this.dataHandler.pay();
       this.reset();
     },
   },
